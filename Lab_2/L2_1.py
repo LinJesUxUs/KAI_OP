@@ -1,6 +1,6 @@
 import math
 
-print("Лаба2. Задание 1.10")
+print("Лаба-2. Задание-1.10")
 
 x = int(input("Введите X "))
 n = int(input("Введите n "))
