@@ -1,58 +1,34 @@
-from typing import Final
-import random
+from functions import randomList
 
 print( "Лаба-3. Задание-2.10" )
 
-INT_MAX: Final = int(2**8/2-1)
-INT_MIN: Final = int(-2**8/2)
+def editedRandomList():
+    A = randomList()
+    print("Исходный список\n",*A)
+    
+    # Поиск группы, содержащей наибольшее число
+    # подряд идущих положительных элементов
+    begin = 0
+    end = 0
+    
+    for i in range(len(A)):
+        if A[i] <= 0:
+            continue
+        for j in range(i+1,len(A)):
+            if (A[j] <= 0) or (j == len(A)-1):
+                if (j-i > end-begin):
+                    if (j == len(A)-1 and A[j] > 0 ):
+                        end = j+1
+                    else:
+                        end = j
+                    begin = i
+                i = j
+                break
+    
+    # Переписка группы в хвост
+    A.extend(A[begin:end])
+    A = A[0:begin] + A[end:]
+    return A
 
-n = int(0)
-A = []
-
-# Обработка ввода колличества случайных переменных
-def customRand(error: bool = False):
-    global n
-    if error:
-        print("Колличество будет определено случайно!")
-        n = random.randint(1,INT_MAX)
-    else: return random.randint(INT_MIN,INT_MAX)
-
-try:
-    n = int(input("Введите колличество случайных переменных:\n"))
-    if n == 0:
-        raise
-except ValueError:
-    print("Введено не целочисленное число")
-    customRand(True)
-except:
-    print("Введён 'n' равный 0")
-    customRand(True)
-
-if n < 0 :
-    print("Введено отрицительное число. Беру его по модулю")
-    n = abs(n)
-
-# Заполнение случайными переменными
-for i in range(n):
-    A.append(customRand())
-
-max_length = 0
-current_length = 0
-begin = 0
-end = 0
-finish = False
-
-while !finish:
-    while (arr[end] > 0):
-    else: arr
-
-
-for i in range(len(arr)):
-    if arr[i] > 0:
-        current_length += 1
-        if current_length > max_length:
-            max_length = current_length
-    else:
-        current_length = 0
-
-print(n,A)
+A = editedRandomList()
+print("Перегруппированный список\n",*A)
