@@ -35,3 +35,12 @@ def randomList():
     for i in range(n):
         A.append(customRand())
     return A
+
+
+def getUIntWithMsg(msg: str = "Enter uint value.\n",error: str = "Error!"):
+    buf = 0
+    while(True):
+        try: buf = abs(int(input(msg)))
+        except: print(error)
+        else: break
+    return buf
