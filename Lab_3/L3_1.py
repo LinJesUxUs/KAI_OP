@@ -18,7 +18,7 @@ while True:
     
     if (s[-1] != "." ):
         print("Строка не заканчивается точкой!")
-        continueX
+        continue
     break
 
 lst = s[:-1].split(" ")
