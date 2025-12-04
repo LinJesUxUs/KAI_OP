@@ -2,6 +2,8 @@
 # a(0)=1;
 # a(n)=a(n div 2)+a(n div 3), n>1;
 
+from functions import getUIntWithMsg
+
 print("Лаба-4. Задание-4.5")
 
 def aRecurs(n):
@@ -16,13 +18,18 @@ def a(n):
 		buf[i] = buf[i//2] + buf[i//3]
 	return buf[n]
 
-n = 10
+n = getUIntWithMsg("Введите длинну последовательности:","Введите целое целое!")
+print("")
 
 for i in range(n):
-	print(aRecurs(i))
+	print(aRecurs(i), end=" ")
+
+print("")
 
 for i in range(n):
-	print(a(i))
+	print(a(i), end=" ")
+
+print("")
 
 # print(aRecurs(1000000))
 # print(a(1000000))
