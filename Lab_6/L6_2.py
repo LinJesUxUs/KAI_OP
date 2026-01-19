@@ -7,140 +7,135 @@ from collections import namedtuple, deque
 Point = namedtuple('Point', ['x','y'])
 Body = namedtuple('Body', ['x','y','shape'])
 
-frameLength = 0.5
-frameSize = 460
-snakeLength = 5
-pointSize = 20
+FRAME_LENGTH = 0.5
+FRAME_SIZE = 460
+SNAKE_LENGTH = 5
+POINT_SIZE = 20
+NORMAL_FRAME_SIZE = FRAME_SIZE // POINT_SIZE
+LIMIT = NORMAL_FRAME_SIZE * POINT_SIZE - POINT_SIZE
+# Цвета
+SNAKE_COLOR = '#b85b68'
+FOOD_COLOR = '#d83830'
+BACKGROUND = "#4b3834"
+CORNERS = '#3b2319'
+TEXT_COLOR = SNAKE_COLOR
 
-directions = {
-    "Left":  Point(-pointSize, 0),
-    "Right": Point(pointSize, 0),
-    "Up":    Point(0, -pointSize),
-    "Down":  Point(0, pointSize)
+DIRECTIONS = {
+    "Left":  Point(-POINT_SIZE, 0),
+    "Right": Point(POINT_SIZE, 0),
+    "Up":    Point(0, -POINT_SIZE),
+    "Down":  Point(0, POINT_SIZE)
 }
 
-field = Point( frameSize, frameSize)
-food = Body(0,0,None)
 body = deque()
+food = Body(0,0,None)
 way_current = "Up"
-game = True
-best_score = 0
+game_running = True
 score = 0
+best_score = 0
 
 move_event = threading.Event()
 
-def SnakeInit(c):
-	c.delete("body","score","food")
-	body.clear()
-	for i in range(snakeLength):
-		buf = Point( field.x/pointSize//2*pointSize, field.y/pointSize//2*pointSize)
-		body.append( Body( buf.x, buf.y
-			,c.create_oval(buf.x, buf.y, buf.x+pointSize-1, buf.y+pointSize-1, tag="body", fill='black')) )
-
 def is_opposite(key):
-	if key == 'Left' and way_current == 'Right':
-		return True
-	if key == 'Right' and way_current == 'Left':
-		return True
-	if key == 'Up' and way_current == 'Down':
-		return True
-	if key == 'Down' and way_current == 'Up':
-		return True
-	return False
+	opposites = {'Left': 'Right', 'Right': 'Left', 'Up': 'Down', 'Down': 'Up'}
+	return opposites.get(key) == way_current
 
-
-def on_key_press(event):
-	global way_current
-	global game
-	key = event.keysym
-	print(key)
-	if key in directions and not is_opposite(key):
-		way_current = key
-		move_event.set()
-	if key == 'r' and game == False:
-		restart()
-	if key == 'q':
-		if game == True:
-			game = False
-			move_event.set()
-		else: root.destroy()
-
-
-def crawl(c,p):
-	c.delete(body[-1].shape)
-	body.pop()
-	body.appendleft( Body( p.x, p.y
-			,c.create_oval(p.x, p.y, p.x+pointSize-1, p.y+pointSize-1, tag="body", fill='black')) )
-
-def check(p):
-	if p.x < pointSize or p.x > frameSize//pointSize*(pointSize-1) or p.y < pointSize or p.y > frameSize//pointSize*(pointSize-1):
+def check_collision(p):
+    # Проверка границ
+	if p.x < POINT_SIZE or p.x >= LIMIT or p.y < POINT_SIZE or p.y >= LIMIT:
 		return False
+    # Проверка столкновения с собой
 	for i in body:
 		if i.x == p.x and i.y == p.y:
 			return False
 	return True
 
-def DropFood(c):
+def snake_body_paint(x,y):
+    return c.create_rectangle( x, y, x+POINT_SIZE-1, y+POINT_SIZE-1, tag="body", fill=SNAKE_COLOR, outline=SNAKE_COLOR)
+
+def snake_init(c):
+	c.delete("body","score","food")
+	body.clear()
+	start_pos = NORMAL_FRAME_SIZE // 2 * POINT_SIZE
+	for i in range(SNAKE_LENGTH):
+		shape = snake_body_paint( start_pos, start_pos)
+		body.append( Body( start_pos, start_pos, shape) )
+
+def drop_food(c):
 	global food
-	if not food.shape == None:
-		c.delete("food")
-	buf = Point(0,0)
-	while not check(buf):
-		buf = Point( random.randrange( pointSize, frameSize//pointSize*(pointSize-1), pointSize)
-				   , random.randrange( pointSize, frameSize//pointSize*(pointSize-1), pointSize) )
-	food = Body( buf.x, buf.y, c.create_rectangle(buf.x, buf.y, buf.x+pointSize, buf.y+pointSize, tag="food", fill='black') )
+	if food.shape: c.delete("food")
+	pos = Point(0,0)
+	while not check_collision(pos):
+		pos = Point( random.randrange( POINT_SIZE, LIMIT, POINT_SIZE)
+				   , random.randrange( POINT_SIZE, LIMIT, POINT_SIZE) )
+	shape = c.create_oval( pos.x, pos.y, pos.x+POINT_SIZE, pos.y+POINT_SIZE, tag="food", fill=FOOD_COLOR, outline=FOOD_COLOR)
+	food = Body( pos.x, pos.y, shape)
 
-def Eating(c):
-	global score
-	body.appendleft( Body( food.x, food.y
-			,c.create_oval(food.x, food.y, food.x+pointSize-1, food.y+pointSize-1, tag="body", fill='black')) )
-	DropFood(c)
-	score+=1
+def crawl(c,new_p):
+	c.delete(body[-1].shape)
+	body.pop()
+	shape = snake_body_paint(new_p.x, new_p.y)
+	body.appendleft( Body( new_p.x, new_p.y, shape) )
 
-def MvSnake(c):
-	global game
-	checkPoint = Point(body[0].x + directions[way_current].x
-					  ,body[0].y + directions[way_current].y)
-	if not check(checkPoint):
-		game = False
-		return None
-	if food.x == checkPoint.x and food.y == checkPoint.y:
-		Eating(c)
-		return None
-	crawl(c,checkPoint)
+def mv_snake(c):
+	global game_running
+	new_p = Point( body[0].x + DIRECTIONS[way_current].x
+				 , body[0].y + DIRECTIONS[way_current].y)
+	if not check_collision(new_p):
+		game_running = False
+		return #None
+	if food.x == new_p.x and food.y == new_p.y:
+		global score
+		score+=1
+		shape = snake_body_paint(food.x, food.y)
+		body.appendleft( Body( food.x, food.y, shape) )
+		drop_food(c)
+	else: crawl(c,new_p)
 
-def paintFrames(c):
-	global game
-	global best_score
-	global score
-	game = True
+def paint_frames(c):
+	global game_running, best_score, score
+	game_running = True
 	score = 0
-	SnakeInit(c)
-	DropFood(c)
-	while game:
-		move_event.wait(timeout=frameLength)
+	snake_init(c)
+	drop_food(c)
+	while game_running:
+		move_event.wait(timeout=FRAME_LENGTH)
 		move_event.clear()
-		MvSnake(c)
-	c.delete("body","food")
-	if score > best_score:
-		best_score = score
-	score_text = c.create_text(frameSize/2, frameSize/2, text=f"Game Over\nscore: {score}\nbest score: {best_score}"
-		, fill="black", font=("Arial", frameSize//9), anchor="center", tag="score")
+		if game_running: mv_snake(c)
+	c.delete( "body", "food")
+	best_score = max( score, best_score)
+	c.create_text(FRAME_SIZE/2, FRAME_SIZE/2
+        , text=f"Game Over\nScore: {score}\nBest: {best_score}\n[R] to Restart"
+		, fill=TEXT_COLOR, font=("Arial", FRAME_SIZE//12, "bold"), justify=CENTER, tag="score")
 
-root = Tk()
-c = Canvas(width=field.x,height=field.y,bg='grey40')
-c.focus_set()
-c.pack()
-root.resizable(False, False)
-c.create_rectangle(0,0,frameSize//pointSize*pointSize,frameSize//pointSize*pointSize,width=pointSize*2)
-
-c.bind('<Key>',on_key_press)
-thread = threading.Thread( target=paintFrames,args=(c,),daemon=True)
-thread.start()
+def on_key_press(event):
+	global way_current, game_running
+	key = event.keysym
+	if key in DIRECTIONS and not is_opposite(key):
+		way_current = key
+		move_event.set()
+	elif key.lower() == 'r' and not game_running:
+		restart()
+	elif key.lower() == 'q':
+		if game_running:
+			game_running = False
+			move_event.set()
+		else: root.destroy()
 
 def restart():
-	move_event.set()
-	thread = threading.Thread( target=paintFrames,args=(c,),daemon=True)
-	thread.start()
+	threading.Thread( target=paint_frames,args=(c,),daemon=True).start()
+
+root = Tk()
+root.title("PySnake")
+root.resizable(False, False)
+c = Canvas(width=FRAME_SIZE,height=FRAME_SIZE,background=BACKGROUND)
+c.pack()
+c.focus_set()
+
+border_size = NORMAL_FRAME_SIZE * POINT_SIZE
+c.create_rectangle(0, 0, border_size, border_size, width=POINT_SIZE*2, outline=CORNERS, fill=BACKGROUND)
+
+c.bind('<Key>',on_key_press)
+restart()
 
 mainloop()
