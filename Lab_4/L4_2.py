@@ -14,49 +14,25 @@ def aRecurs(n):
 def a(n):
 	buf = {}
 	buf[0] = 1
-	# if n in buf: return buf[n]
+	lst = []
+	i = n
+		
+	for i in range(n,1,-1):
+		lst.append(i)
 	for i in range(1,n+1):
-		# if i not in buf:
-		buf[i] = buf[i//2] + buf[i//3]
+		if i not in buf:
+			buf[i] = buf[i//2] + buf[i//3]
 	return buf[n]
 
-# buf = {}
-# buf[0] = 1
-# def a(n):
-# 	global buf
-# 	if n in buf: return buf[n]
-# 	for i in range(1,n+1):
-# 		if i not in buf:
-# 			buf[i] = buf[i//2] + buf[i//3]
-# 	return buf[n]
+n = getUIntWithMsg("Введите длинну последовательности:","Введите целое целое!")
+# n = 10000
 
-# n = getUIntWithMsg("Введите длинну последовательности:","Введите целое целое!")
-# print("")
+print()
 
-# for i in range(n):
-# 	print(aRecurs(i), end=" ")
-
-# print("")
-
-# for i in range(n):
-# 	print(a(i), end=" ")
-
-# print("")
-
-n = 10000
 start = time.perf_counter()
-for i in range(n):
-	aRecurs(i)
-print(f"aRecurs({n}): {(time.perf_counter()-start):.6f} seconds")
+v = aRecurs(n)
+print(f"aRecurs({n}) = {v}\t: {(time.perf_counter()-start):.6f} seconds")
+
 start = time.perf_counter()
-for i in range(n):
-	a(i)
-print(f"a({n}): {(time.perf_counter()-start):.6f} seconds")
-start = time.perf_counter()
-for i in range(n):
-	aRecurs(i)
-print(f"aRecurs({n+1}): {(time.perf_counter()-start):.6f} seconds")
-start = time.perf_counter()
-for i in range(n):
-	a(i)
-print(f"a({n+1}): {(time.perf_counter()-start):.6f} seconds")
+v = a(n)
+print(f"a({n}) = {v}      \t: {(time.perf_counter()-start):.6f} seconds")
