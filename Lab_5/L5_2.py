@@ -14,7 +14,7 @@ def read_graph_from_csv(filename):
                 if val == '' or val == '0':
                     graph_row.append(0)
                 else:
-                    graph_row.append(float(val) if '.' in val else int(val))
+                    graph_row.append(float(val) if '.' in val else int(val)) # тернарный оператор
             graph.append(graph_row)
     return graph
 
@@ -98,97 +98,87 @@ def bfs_shortest_path(graph, start, end):
     
     return path
 
-def main():
-    print("Программа для поиска кратчайшего пути в графе")
-    print("=" * 50)
-    
-    # Запрос имени файла
-    filename = input("Введите имя CSV-файла с матрицей смежности: ")
-    
-    try:
-        # Чтение графа из файла
-        graph = read_graph_from_csv(filename)
-        n = len(graph)
-        
-        print(f"\nГраф успешно загружен из файла '{filename}'")
-        print(f"Количество вершин: {n}")
-        
-        # Проверка, что вершин больше 15
-        if n <= 15:
-            print(f"Внимание: количество вершин ({n}) должно быть больше 15!")
-            return
-        
-        # Вывод информации о графе
-        print("\nМатрица смежности (первые 5 строк и столбцов):")
-        for i in range(min(5, n)):
-            row_preview = []
-            for j in range(min(5, n)):
-                row_preview.append(str(graph[i][j]))
-            if n > 5:
-                row_preview.append("...")
-            print("  ".join(row_preview))
-        if n > 5:
-            print("...")
-        
-        # Определяем тип графа (взвешенный или нет)
-        is_weighted = False
-        for i in range(min(n, 10)):
-            for j in range(min(n, 10)):
-                if graph[i][j] > 0 and graph[i][j] != 1:
-                    is_weighted = True
-                    break
-        
-        print(f"\nТип графа: {'Взвешенный' if is_weighted else 'Невзвешенный'}")
-        
-        # Запрос вершин у пользователя
-        print("\n" + "=" * 50)
-        print("Введите номера вершин (от 0 до {})".format(n-1))
-        
-        while True:
-            try:
-                start = int(input(f"Начальная вершина (0-{n-1}): "))
-                if 0 <= start < n:
-                    break
-                else:
-                    print(f"Ошибка: вершина должна быть в диапазоне 0-{n-1}")
-            except ValueError:
-                print("Ошибка: введите целое число")
-        
-        while True:
-            try:
-                end = int(input(f"Конечная вершина (0-{n-1}): "))
-                if 0 <= end < n:
-                    break
-                else:
-                    print(f"Ошибка: вершина должна быть в диапазоне 0-{n-1}")
-            except ValueError:
-                print("Ошибка: введите целое число")
-        
-        # Поиск кратчайшего пути
-        print("\n" + "=" * 50)
-        print(f"Поиск кратчайшего пути из вершины {start} в вершину {end}...")
-        
-        if is_weighted:
-            path, distance = dijkstra(graph, start, end)
-            if path:
-                print(f"Кратчайший путь найден!")
-                print(f"Длина пути: {distance}")
-                print(f"Маршрут: {' -> '.join(map(str, path))}")
-            else:
-                print(f"Путь из вершины {start} в вершину {end} не существует")
-        else:
-            path = bfs_shortest_path(graph, start, end)
-            if path:
-                print(f"Кратчайший путь найден!")
-                print(f"Длина пути: {len(path)-1} ребер")
-                print(f"Маршрут: {' -> '.join(map(str, path))}")
-            else:
-                print(f"Путь из вершины {start} в вершину {end} не существует")
-                
-    except FileNotFoundError:
-        print(f"Ошибка: файл '{filename}' не найден")
-    except Exception as e:
-        print(f"Ошибка: {str(e)}")
+print("Программа для поиска кратчайшего пути в графе")
 
-if __name__ == "__main__":
-    main()
+# Запрос имени файла
+filename = input("Введите имя CSV-файла с матрицей смежности: ")
+
+try:
+    # Чтение графа из файла
+    graph = read_graph_from_csv(filename)
+    n = len(graph)
+    
+    print(f"\nГраф успешно загружен из файла '{filename}'")
+    print(f"Количество вершин: {n}")
+    
+    # Вывод информации о графе
+    print("\nМатрица смежности (первые 5 строк и столбцов):")
+    for i in range(min(5, n)):
+        row_preview = []
+        for j in range(min(5, n)):
+            row_preview.append(str(graph[i][j]))
+        if n > 5:
+            row_preview.append("...")
+        print("  ".join(row_preview))
+    if n > 5:
+        print("...")
+    
+    # Определяем тип графа (взвешенный или нет)
+    is_weighted = False
+    for i in range(min(n, 10)):
+        for j in range(min(n, 10)):
+            if graph[i][j] > 0 and graph[i][j] != 1:
+                is_weighted = True
+                break
+    
+    print(f"\nТип графа: {'Взвешенный' if is_weighted else 'Невзвешенный'}")
+    
+    # Запрос вершин у пользователя
+    print("\n" + "=" * 50)
+    print("Введите номера вершин (от 0 до {})".format(n-1))
+    
+    while True:
+        try:
+            start = int(input(f"Начальная вершина (0-{n-1}): "))
+            if 0 <= start < n:
+                break
+            else:
+                print(f"Ошибка: вершина должна быть в диапазоне 0-{n-1}")
+        except ValueError:
+            print("Ошибка: введите целое число")
+    
+    while True:
+        try:
+            end = int(input(f"Конечная вершина (0-{n-1}): "))
+            if 0 <= end < n:
+                break
+            else:
+                print(f"Ошибка: вершина должна быть в диапазоне 0-{n-1}")
+        except ValueError:
+            print("Ошибка: введите целое число")
+    
+    # Поиск кратчайшего пути
+    print("\n" + "=" * 50)
+    print(f"Поиск кратчайшего пути из вершины {start} в вершину {end}...")
+    
+    if is_weighted:
+        path, distance = dijkstra(graph, start, end)
+        if path:
+            print(f"Кратчайший путь найден!")
+            print(f"Длина пути: {distance}")
+            print(f"Маршрут: {' -> '.join(map(str, path))}")
+        else:
+            print(f"Путь из вершины {start} в вершину {end} не существует")
+    else:
+        path = bfs_shortest_path(graph, start, end)
+        if path:
+            print(f"Кратчайший путь найден!")
+            print(f"Длина пути: {len(path)-1} ребер")
+            print(f"Маршрут: {' -> '.join(map(str, path))}")
+        else:
+            print(f"Путь из вершины {start} в вершину {end} не существует")
+            
+except FileNotFoundError:
+    print(f"Ошибка: файл '{filename}' не найден")
+except Exception as e:
+    print(f"Ошибка: {str(e)}")
