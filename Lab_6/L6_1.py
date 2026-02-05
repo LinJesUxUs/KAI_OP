@@ -1,4 +1,6 @@
 from tkinter import *
+import time
+import _thread
 
 c = Canvas(width=460,height=460,bg='grey80')
 c.pack()
@@ -28,5 +30,34 @@ c.bind('<Button-3>',color)
 def clean(event):
     c.delete(oval, trian)
 c.bind('<Button-2>',clean)
+
+c2 = Canvas(width=460,height=100,bg='grey80')
+c2.pack()
+
+oval = c2.create_oval(30,10,130,80,fill="orange")
+c2.create_rectangle(180,10,280,80,tag="rect",fill="lightgreen")
+trian = c2.create_polygon(330,80,380,10,430,80,fill='white',outline="black")
+
+
+def oval_func(event):
+    c2.delete(oval)
+    _thread.start_new_thread(f1, ())
+def rect_func(event):
+    c2.delete("rect")
+    c2.create_text(180,10,text="Здесь был\nпрямоугольник",anchor="nw")
+def triangle(event):
+    c2.create_polygon(350,70,380,20,410,70,fill='yellow',outline="black")
+def f1():
+    # cnt = 3
+    while True:
+        oval = c2.create_oval(30,10,130,80,fill="red")
+        time.sleep(0.5)
+        c2.delete(oval)
+        time.sleep(0.5)
+    _thread.exit()
+
+c2.tag_bind(oval,'<Button-1>',oval_func)
+c2.tag_bind("rect",'<Button-1>',rect_func)
+c2.tag_bind(trian,'<Button-1>',triangle)
 
 mainloop()
