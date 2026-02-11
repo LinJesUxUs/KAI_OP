@@ -1,6 +1,7 @@
 import csv
 import heapq
 import sys
+import os
 
 def read_graph_from_csv(filename):
     """Чтение матрицы смежности из CSV-файла"""
@@ -53,9 +54,10 @@ def bfs_shortest_path(graph, start, end):
     return path
 
 print("Программа для поиска кратчайшего пути в графе")
-
 # Запрос имени файла
 filename = input("Введите имя CSV-файла с матрицей смежности: ")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+filename = script_dir + '/' + filename
 
 try:
     # Чтение графа из файла
