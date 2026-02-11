@@ -34,10 +34,10 @@ def bfs_shortest_path(graph, start, end):
             break
         
         for neighbor in range(n):
-            if graph[current][neighbor] > 0 and not visited[neighbor]:
-                visited[neighbor] = True
-                previous[neighbor] = current
-                queue.append(neighbor)
+            if graph[current][neighbor] > 0 and not visited[neighbor]: # преверка доступных не посещённых узлов
+                visited[neighbor] = True # в узел neighbor больше не заглядывать
+                previous[neighbor] = current # откуда нашли neighbor
+                queue.append(neighbor) # в будущем посмотреть соседей neighbor
     
     # Если путь не найден
     if not visited[end]:
@@ -46,10 +46,10 @@ def bfs_shortest_path(graph, start, end):
     # Восстанавливаем путь
     path = []
     current = end
-    while current != -1:
+    while current != -1: # поиск обратного пути из end
         path.append(current)
         current = previous[current]
-    path.reverse()
+    path.reverse() # развернуть путь
     
     return path
 
