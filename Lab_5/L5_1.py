@@ -33,6 +33,5 @@ while(True):
 f.close()
 f = open( os.path.dirname(os.path.abspath(__file__)) + "/out.txt", 'w', encoding='utf-8')
 f.write(text)
-# print(text)
 
 f.close()
