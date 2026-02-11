@@ -38,7 +38,6 @@ oval = c2.create_oval(30,10,130,80,fill="orange")
 c2.create_rectangle(180,10,280,80,tag="rect",fill="lightgreen")
 trian = c2.create_polygon(330,80,380,10,430,80,fill='white',outline="black")
 
-
 def oval_func(event):
     c2.delete(oval)
     _thread.start_new_thread(f1, ())
@@ -48,7 +47,6 @@ def rect_func(event):
 def triangle(event):
     c2.create_polygon(350,70,380,20,410,70,fill='yellow',outline="black")
 def f1():
-    # cnt = 3
     while True:
         oval = c2.create_oval(30,10,130,80,fill="red")
         time.sleep(0.5)
