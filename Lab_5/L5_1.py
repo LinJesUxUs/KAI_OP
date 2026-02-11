@@ -5,6 +5,7 @@
 
 # 10. Удалить последовательности символов, заключённе в фигурные скобки
 
+import os
 print("Лаба-5. Задание-5.1")
 
 def getRecursCloseBraceIndex (text: str, begin_char, end_char):
@@ -18,7 +19,7 @@ def getRecursCloseBraceIndex (text: str, begin_char, end_char):
 		if count == 0: break
 	return length
 
-f = open("in.txt")
+f = open( os.path.dirname(os.path.abspath(__file__)) + "/in.txt", 'r', encoding='utf-8')
 text = f.read()
 begin_char = '{'
 end_char = '}'
@@ -29,6 +30,9 @@ while(True):
 	end = begin + getRecursCloseBraceIndex(text[begin:], begin_char, end_char)
 	text = text[:begin] + text[end+1:]
 
-print(text)
+f.close()
+f = open( os.path.dirname(os.path.abspath(__file__)) + "/out.txt", 'w', encoding='utf-8')
+f.write(text)
+# print(text)
 
 f.close()
